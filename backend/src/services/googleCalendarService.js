@@ -23,11 +23,13 @@ export async function fetchEvents(calendarId) {
   return response.data.items;
 }
 
-export async function fetchAvailability() {
-  const calendarId = process.env.CALENDAR_ID;
+export async function fetchAvailability(oauth2Client) {
+  const calendarId = process.env.CALENDAR_ID; // Verifique se o nome da variável no .env está correto
   if (!calendarId) {
     throw new Error("O ID da agenda de disponibilidade não foi configurado!");
   }
+
+  const calendar = google.calendar({ version: "v3", auth: oauth2Client });
 
   const response = await calendar.events.list({
     calendarId: calendarId,
@@ -36,12 +38,21 @@ export async function fetchAvailability() {
     singleEvents: true,
     orderBy: "startTime",
   });
-  return response.data.items;
+
+  const allEvents = response.data.items;
+
+  const availableSlots = allEvents.filter((event) => {
+    return event.summary === "Disponível";
+  });
+
+  // Retorna a lista JÁ FILTRADA
+  return availableSlots;
 }
 
 export async function createBookingAndUpdateEvent(bookingData) {
   const { eventId, establishmentName, guestName, attendeeEmail } = bookingData;
   const calendarId = process.env.CALENDAR_ID;
+  const organizerEmail = process.env.ORGANIZER_EMAIL;
 
   if (!calendarId) {
     throw new Error(
@@ -63,22 +74,21 @@ export async function createBookingAndUpdateEvent(bookingData) {
       bookingData,
       newBooking._id
     );
-    const meetingSummary = `OverView WIFIRE - ${
-      establishmentName || guestName
-    }`;
+    const meetingSummary = `Reunião - ${establishmentName || guestName}`;
 
     const updateEvent = await calendar.events.patch({
       calendarId: calendarId,
       eventId: eventId,
       conferenceDataVersion: 1,
+      sendNotifications: true,
       requestBody: {
         summary: meetingSummary,
         description: descriptionForEvent,
         status: "confirmed",
         colorId: "2",
         attendees: [
-          { email: attendeeEmail },
-          { email: process.env.ORGANIZER_EMAIL }, // Use uma variável de ambiente para o email do organizador
+          { email: attendeeEmail, responseStatus: "accepted" },
+          { email: organizerEmail, responseStatus: "accepted" },
         ],
         conferenceData: {
           createRequest: {

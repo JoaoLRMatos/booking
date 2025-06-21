@@ -1,4 +1,5 @@
 // Importa o nosso novo serviço
+import { oauth2Client } from "../config/googleClient.js";
 import * as googleCalendarService from "../services/googleCalendarService.js";
 
 export async function listCalendars(req, res) {
@@ -28,7 +29,9 @@ export async function listEvents(req, res) {
 
 export async function getAvailability(req, res) {
   try {
-    const availableSlots = await googleCalendarService.fetchAvailability();
+    const availableSlots = await googleCalendarService.fetchAvailability(
+      oauth2Client
+    );
     res.json(availableSlots);
   } catch (error) {
     console.error("Erro no controller ao buscar horários:", error.message);

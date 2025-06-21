@@ -20,7 +20,7 @@ export async function handleRedirect(req, res) {
     }
     const { tokens } = await oauth2Client.getToken(code);
     oauth2Client.setCredentials(tokens);
-    await saveCredentials(tokens); // Delega a responsabilidade para o service
+    await saveCredentials(tokens);
     res.send("Login bem-sucedido! Pode fechar essa aba.");
   } catch (error) {
     console.error("Erro ao obter token:", error.message);

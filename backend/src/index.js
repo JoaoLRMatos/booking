@@ -3,11 +3,14 @@ import calendarRouter from "./routes/calendarRoutes.js";
 import { loadTokenIfExists } from "./services/tokenService.js";
 import { connectDB } from "./db/database.js";
 import authRoutes from "./routes/authRoutes.js";
+import cors from "cors";
 
 const app = express();
 const PORT = 3000;
 
+app.use(cors());
 app.use(express.json());
+
 app.use("/", calendarRouter);
 app.use("/", authRoutes);
 

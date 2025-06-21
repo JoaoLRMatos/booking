@@ -14,8 +14,6 @@ ${data.cnpj}
 Assunto
 ${data.customSubject || "Não informado"}
 
----
-ID do Agendamento (Banco de Dados): ${data._id}
-Agendado através do sistema de agendamento automático.
+Olá pessoal que agendou o agendamento, obrigado por agendar
 `;
 }

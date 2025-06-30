@@ -109,7 +109,6 @@ export async function createBookingAndUpdateEvent(bookingData) {
     console.error("Erro ao atualizar evento no Google. Iniciando rollback...");
     await Booking.findByIdAndDelete(newBooking._id);
     console.log(`ROLLBACK: Agendamento ${newBooking._id} removido do MongoDB.`);
-
     // Lança o erro para que o controller possa capturá-lo
     throw new Error(
       `Erro ao atualizar o evento no Google Calendar: ${error.message}`
